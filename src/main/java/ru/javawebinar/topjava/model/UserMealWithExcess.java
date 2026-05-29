@@ -1,14 +1,12 @@
 package ru.javawebinar.topjava.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class UserMealWithExcess {
     private final LocalDateTime dateTime;
-
     private final String description;
-
     private final int calories;
-
     private final boolean excess;
 
     public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, boolean excess) {
@@ -16,6 +14,22 @@ public class UserMealWithExcess {
         this.description = description;
         this.calories = calories;
         this.excess = excess;
+    }
+
+    public String getDateTimeStr() {
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public boolean isExcess() {
+        return excess;
     }
 
     @Override
