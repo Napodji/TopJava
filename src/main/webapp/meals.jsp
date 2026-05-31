@@ -5,20 +5,18 @@
     <title>Meals</title>
 </head>
 <body>
-<h2>Список еды</h2>
-<table border="1" cellpadding="8" cellspacing="0">
+<h3>Meals</h3>
+<table border="1" cellpadding="8">
     <tr>
-        <th>Дата/Время</th>
-        <th>Описание</th>
-        <th>Калории</th>
-        <th>Превышение</th>
+        <th>Date/Time</th>
+        <th>Description</th>
+        <th>Calories</th>
     </tr>
     <c:forEach var="meal" items="${meals}">
-        <tr style="color: ${meal.excess ? 'red' : 'green'}">
-            <td>${meal.dateTimeStr}</td>
+        <tr style="background-color: ${meal.excess ? '#ffcccc' : '#ccffcc'}">
+            <td>${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>
-            <td>${meal.excess}</td>
         </tr>
     </c:forEach>
 </table>
