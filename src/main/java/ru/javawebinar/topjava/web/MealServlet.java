@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class MealServlet extends HttpServlet {
@@ -40,7 +41,7 @@ public class MealServlet extends HttpServlet {
 
         } else if ("create".equals(action) || "update".equals(action)) {
             Meal meal = "create".equals(action)
-                    ? new Meal(LocalDateTime.now(), "", 1000)
+                    ? new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000)
                     : repository.get(Integer.parseInt(request.getParameter("id")));
             request.setAttribute("meal", meal);
             log.debug("forward to mealForm");
@@ -48,7 +49,7 @@ public class MealServlet extends HttpServlet {
 
         } else {
             log.debug("forward to meals");
-            List<MealTo> meals = MealsUtil.filteredByStreams(repository.getAll(), MealsUtil.CALORIES_PER_DAY);
+            List<MealTo> meals = MealsUtil.getTos(repository.getAll(), MealsUtil.CALORIES_PER_DAY);
             request.setAttribute("meals", meals);
             request.getRequestDispatcher("/meals.jsp").forward(request, response);
         }
