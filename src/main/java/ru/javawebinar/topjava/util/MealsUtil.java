@@ -6,13 +6,13 @@ import ru.javawebinar.topjava.to.MealTo;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class MealsUtil {
+
     public static final int DEFAULT_CALORIES_PER_DAY = 2000;
 
     public static List<MealTo> getTos(Collection<Meal> meals, int caloriesPerDay) {
@@ -25,15 +25,13 @@ public class MealsUtil {
                 meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime));
     }
 
-    private static List<MealTo> filterByPredicate(Collection<Meal> meals, int caloriesPerDay, Predicate<Meal> filter) {
-        if (meals == null || meals.isEmpty()) {
-            return Collections.emptyList();
-        }
-
+    private static List<MealTo> filterByPredicate(Collection<Meal> meals, int caloriesPerDay,
+                                                  Predicate<Meal> filter) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(Collectors.groupingBy(
                         meal -> meal.getDateTime().toLocalDate(),
-                        Collectors.summingInt(Meal::getCalories)));
+                        Collectors.summingInt(Meal::getCalories)
+                ));
 
         return meals.stream()
                 .filter(filter)
