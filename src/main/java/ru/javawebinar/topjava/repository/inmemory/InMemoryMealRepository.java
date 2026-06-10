@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
-
     private final Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
 
@@ -32,8 +31,8 @@ public class InMemoryMealRepository implements MealRepository {
         ).forEach(meal -> save(meal, 1));
 
         Arrays.asList(
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 300),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 600)
+                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Еда на двоих", 300),
+                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Еда на двоих", 600)
         ).forEach(meal -> save(meal, 2));
     }
 
@@ -67,6 +66,19 @@ public class InMemoryMealRepository implements MealRepository {
             return Collections.emptyList();
         }
         return meals.values().stream()
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
+        Map<Integer, Meal> meals = repository.get(userId);
+        if (meals == null) {
+            return Collections.emptyList();
+        }
+        return meals.values().stream()
+                .filter(meal -> meal.getDateTime().compareTo(startDateTime) >= 0
+                        && meal.getDateTime().compareTo(endDateTime) < 0)
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
