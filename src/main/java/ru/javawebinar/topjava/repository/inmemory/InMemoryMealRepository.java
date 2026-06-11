@@ -28,8 +28,8 @@ public class InMemoryMealRepository implements MealRepository {
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
+                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 1000),
+                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 1000)
         ).forEach(meal -> save(meal, 1));
 
         Arrays.asList(

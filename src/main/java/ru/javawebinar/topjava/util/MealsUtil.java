@@ -3,7 +3,6 @@ package ru.javawebinar.topjava.util;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
@@ -21,13 +20,16 @@ public class MealsUtil {
 
     public static List<MealTo> getFilteredTos(Collection<Meal> meals, int caloriesPerDay,
                                               LocalTime startTime, LocalTime endTime) {
-        return filterByPredicate(meals, caloriesPerDay,
-                meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime));
+        return filterByPredicate(meals, caloriesPerDay, meal -> {
+            LocalTime time = meal.getDateTime().toLocalTime();
+            return (startTime == null || !time.isBefore(startTime))
+                    && (endTime == null || time.isBefore(endTime));
+        });
     }
 
     private static List<MealTo> filterByPredicate(Collection<Meal> meals, int caloriesPerDay,
                                                   Predicate<Meal> filter) {
-        Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
+        Map<java.time.LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(Collectors.groupingBy(
                         meal -> meal.getDateTime().toLocalDate(),
                         Collectors.summingInt(Meal::getCalories)

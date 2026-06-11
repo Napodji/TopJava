@@ -5,16 +5,20 @@
 <html>
 <head>
     <title>Meals</title>
+    <style>
+        .excess { background-color: #f8d7da; }
+        .normal { background-color: #d4edda; }
+    </style>
 </head>
 <body>
 <h2>Meals</h2>
 
 <form method="get" action="meals">
     <input type="hidden" name="action" value="filter">
-    From date: <input type="date" name="startDate">
-    To date: <input type="date" name="endDate">
-    From time: <input type="time" name="startTime">
-    To time: <input type="time" name="endTime">
+    From date: <input type="date" name="startDate" value="${param.startDate}">
+    To date:   <input type="date" name="endDate"   value="${param.endDate}">
+    From time: <input type="time" name="startTime" value="${param.startTime}">
+    To time:   <input type="time" name="endTime"   value="${param.endTime}">
     <button type="submit">Filter</button>
 </form>
 <br>
@@ -24,15 +28,13 @@
         <th>Date/Time</th>
         <th>Description</th>
         <th>Calories</th>
-        <th>Excess</th>
         <th>Action</th>
     </tr>
     <c:forEach var="meal" items="${meals}">
-        <tr style="${meal.excess ? 'color: red' : ''}">
+        <tr class="${meal.excess ? 'excess' : 'normal'}">
             <td>${fn:formatDateTime(meal.dateTime)}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>
-            <td>${meal.excess}</td>
             <td>
                 <a href="meals?action=update&id=${meal.id}">Edit</a>
                 <a href="meals?action=delete&id=${meal.id}">Delete</a>
