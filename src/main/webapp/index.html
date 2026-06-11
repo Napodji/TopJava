@@ -1,14 +1,20 @@
-<html lang="ru">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Java Enterprise (Topjava)</title>
+    <title>TopJava</title>
 </head>
 <body>
-<h3>Проект <a href="https://github.com/JavaWebinar/topjava" target="_blank">Java Enterprise (Topjava)</a></h3>
-<hr>
-<ul style="font-size: large">
-    <li><a href="users">Users</a></li>
-    <li><a href="meals">Meals</a></li>
-</ul>
+<h2>TopJava</h2>
+<a href="meals">Meals</a><br><br>
+
+<form method="post" action="users">
+    <label>User:
+        <select name="userId">
+            <option value="1">User (id=1)</option>
+            <option value="2">Admin (id=2)</option>
+        </select>
+    </label>
+    <button type="submit">Switch</button>
+</form>
 </body>
 </html>
