@@ -3,11 +3,10 @@ package ru.javawebinar.topjava.service;
 import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.ValidationUtil;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -32,10 +31,10 @@ public class MealService {
     }
 
     public List<Meal> getBetweenInclusive(LocalDate startDate, LocalDate endDate, int userId) {
-        // null границы заменяем на MIN/MAX — любая комбинация пустых полей работает без NPE
-        LocalDateTime startDateTime = (startDate != null ? startDate : LocalDate.MIN).atStartOfDay();
-        LocalDateTime endDateTime = (endDate != null ? endDate : LocalDate.MAX).atTime(LocalTime.MAX);
-        return repository.getBetweenHalfOpen(startDateTime, endDateTime, userId);
+        return repository.getBetweenHalfOpen(
+                DateTimeUtil.atStartOfDayOrMin(startDate),
+                DateTimeUtil.atStartOfNextDayOrMax(endDate),
+                userId);
     }
 
     public Meal create(Meal meal, int userId) {
