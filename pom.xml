@@ -1,13 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.javawebinar</groupId>
     <artifactId>topjava</artifactId>
     <packaging>war</packaging>
-
     <version>1.0-SNAPSHOT</version>
-
     <name>Calories Management</name>
     <url>https://javaops-demo.ru/topjava</url>
 
@@ -16,14 +16,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring.version>5.3.39</spring.version>
-
-        <!-- Logging -->
         <logback.version>1.2.13</logback.version>
         <slf4j.version>1.7.36</slf4j.version>
-
-        <!--DB-->
         <postgresql.version>42.7.8</postgresql.version>
-        <!--    Tests  -->
         <junit.version>4.13.2</junit.version>
         <assertj.version>3.27.6</assertj.version>
     </properties>
@@ -58,20 +53,18 @@
     </build>
 
     <dependencies>
-        <!-- Logging with SLF4J & LogBack -->
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>${slf4j.version}</version>
-            <scope>runtime</scope>
+            <!-- scope runtime убран — теперь доступен при компиляции -->
         </dependency>
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -79,6 +72,7 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Annotations -->
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
@@ -97,28 +91,27 @@
             <version>${spring.version}</version>
         </dependency>
 
-        <!--DataBase-->
+        <!-- DB -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
         </dependency>
 
-        <!--Web-->
+        <!-- Web -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
 
-        <!--Test-->
+        <!-- Test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -138,10 +131,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-    </profiles>
-
-    <dependencyManagement>
-    </dependencyManagement>
 </project>
