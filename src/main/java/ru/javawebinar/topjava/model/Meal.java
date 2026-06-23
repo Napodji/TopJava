@@ -10,7 +10,6 @@ public class Meal extends AbstractBaseEntity {
     private String description;
     private int calories;
 
-    // no-arg конструктор
     public Meal() {
     }
 
@@ -25,17 +24,37 @@ public class Meal extends AbstractBaseEntity {
         this.calories = calories;
     }
 
-    // Геттеры
-    public LocalDateTime getDateTime() { return dateTime; }
-    public String getDescription() { return description; }
-    public int getCalories() { return calories; }
-    public LocalDate getDate() { return dateTime.toLocalDate(); }
-    public LocalTime getTime() { return dateTime.toLocalTime(); }
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
 
-    // Сеттеры
-    public void setDateTime(LocalDateTime dateTime) { this.dateTime = dateTime; }
-    public void setDescription(String description) { this.description = description; }
-    public void setCalories(int calories) { this.calories = calories; }
+    public String getDescription() {
+        return description;
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public LocalDate getDate() {
+        return dateTime.toLocalDate();
+    }
+
+    public LocalTime getTime() {
+        return dateTime.toLocalTime();
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
 
     @Override
     public String toString() {
