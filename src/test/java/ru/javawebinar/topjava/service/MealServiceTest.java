@@ -1,8 +1,14 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Ignore;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExternalResource;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,6 +20,9 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -26,8 +35,34 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@Ignore
 public class MealServiceTest {
+
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+
+    // имя теста -> время выполнения в мс
+    private static final Map<String, Long> results = new LinkedHashMap<>();
+
+    // вывод времени каждого теста
+    @Rule
+    public final Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            long ms = TimeUnit.NANOSECONDS.toMillis(nanos);
+            String name = description.getMethodName();
+            log.info("Test '{}' finished in {} ms", name, ms);
+            results.put(name, ms);
+        }
+    };
+
+    // сводка в конце
+    @ClassRule
+    public static final ExternalResource summary = new ExternalResource() {
+        @Override
+        protected void after() {
+            log.info("\nTest summary:");
+            results.forEach((name, ms) -> log.info("  {}: {} ms", name, ms));
+        }
+    };
 
     @Autowired
     private MealService service;
