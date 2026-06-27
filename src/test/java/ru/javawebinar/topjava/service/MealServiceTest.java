@@ -59,8 +59,10 @@ public class MealServiceTest {
     public static final ExternalResource summary = new ExternalResource() {
         @Override
         protected void after() {
-            log.info("\nTest summary:");
-            results.forEach((name, ms) -> log.info("  {}: {} ms", name, ms));
+            StringBuilder sb = new StringBuilder("\nTest summary:\n");
+            results.forEach((name, ms) ->
+                    sb.append("  ").append(name).append(": ").append(ms).append(" ms\n"));
+            log.info(sb.toString());
         }
     };
 
