@@ -2,11 +2,9 @@ package ru.javawebinar.topjava.service;
 
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.repository.datajpa.DataJpaMealRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,10 +48,7 @@ public class MealService {
         return repository.save(meal, userId);
     }
 
-    @Transactional(readOnly = true)
     public Meal getWithUser(int id, int userId) {
-        Assert.state(repository instanceof DataJpaMealRepository, "Only supported for DataJpa profile");
-        Meal meal = ((DataJpaMealRepository) repository).getWithUser(id, userId);
-        return checkNotFound(meal, id);
+        return checkNotFound(repository.getWithUser(id, userId), id);
     }
 }

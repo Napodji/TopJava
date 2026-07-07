@@ -12,10 +12,10 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public abstract class AbstractJdbcMealRepository implements MealRepository {
+public abstract class AbstractJdbcMealRepository<T> implements MealRepository {
 
-    protected final JdbcTemplate jdbcTemplate;
-    protected final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final SimpleJdbcInsert insertMeal;
 
     protected AbstractJdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -29,7 +29,7 @@ public abstract class AbstractJdbcMealRepository implements MealRepository {
 
     protected abstract RowMapper<Meal> getRowMapper();
 
-    protected abstract Object dateTimeToParam(LocalDateTime dateTime);
+    protected abstract T dateTimeToParam(LocalDateTime dateTime);
 
     @Override
     public Meal save(Meal meal, int userId) {
