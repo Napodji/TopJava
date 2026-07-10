@@ -29,10 +29,6 @@ public abstract class AbstractJdbcMealRepository<T> implements MealRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    protected RowMapper<Meal> getRowMapper() {
-        return ROW_MAPPER;
-    }
-
     protected abstract T dateTimeToParam(LocalDateTime dateTime);
 
     @Override
@@ -66,7 +62,7 @@ public abstract class AbstractJdbcMealRepository<T> implements MealRepository {
     public Meal get(int id, int userId) {
         List<Meal> meals = jdbcTemplate.query(
                 "SELECT * FROM meal WHERE id=? AND user_id=?",
-                getRowMapper(),
+                ROW_MAPPER,
                 id,
                 userId);
         return DataAccessUtils.singleResult(meals);
@@ -76,7 +72,7 @@ public abstract class AbstractJdbcMealRepository<T> implements MealRepository {
     public List<Meal> getAll(int userId) {
         return jdbcTemplate.query(
                 "SELECT * FROM meal WHERE user_id=? ORDER BY date_time DESC",
-                getRowMapper(),
+                ROW_MAPPER,
                 userId);
     }
 
@@ -84,7 +80,7 @@ public abstract class AbstractJdbcMealRepository<T> implements MealRepository {
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
         return jdbcTemplate.query(
                 "SELECT * FROM meal WHERE user_id=? AND date_time >= ? AND date_time < ? ORDER BY date_time DESC",
-                getRowMapper(),
+                ROW_MAPPER,
                 userId,
                 dateTimeToParam(startDateTime),
                 dateTimeToParam(endDateTime));
