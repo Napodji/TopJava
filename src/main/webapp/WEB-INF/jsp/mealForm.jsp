@@ -5,20 +5,15 @@
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
+<jsp:include page="fragments/bodyHeader.jsp"/>
+<jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
+
 <section>
-    <jsp:include page="fragments/bodyHeader.jsp"/>
     <hr>
     <h2>
-        <c:choose>
-            <c:when test="${empty meal.id}">
-                <spring:message code="meal.add"/>
-            </c:when>
-            <c:otherwise>
-                <spring:message code="meal.edit"/>
-            </c:otherwise>
-        </c:choose>
+        <spring:message code="${empty meal.id ? 'meal.add' : 'meal.edit'}"/>
     </h2>
-    <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
+
     <form method="post" action="<c:url value='${empty meal.id ? "/meals/create" : "/meals/update"}'/>">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
@@ -36,7 +31,8 @@
         <button type="submit"><spring:message code="common.save"/></button>
         <button onclick="window.history.back()" type="button"><spring:message code="common.cancel"/></button>
     </form>
-    <jsp:include page="fragments/footer.jsp"/>
 </section>
+
+<jsp:include page="fragments/footer.jsp"/>
 </body>
 </html>

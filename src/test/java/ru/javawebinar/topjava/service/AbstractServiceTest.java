@@ -1,13 +1,12 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Assume;
+import org.assertj.core.api.Assertions;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -15,9 +14,6 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.TimingRules;
-
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static ru.javawebinar.topjava.Profiles.JDBC;
 
 @ContextConfiguration("classpath:spring/spring-test-nocache.xml")
 @RunWith(SpringRunner.class)
@@ -31,25 +27,30 @@ public abstract class AbstractServiceTest {
     @Rule
     public Stopwatch stopwatch = TimingRules.STOPWATCH;
 
-    @Autowired
-    private Environment environment;
-
     protected void assumeValidationSupported() {
-        Assume.assumeFalse(isActiveProfile(JDBC));
     }
 
-    private boolean isActiveProfile(String profile) {
-        for (String activeProfile : environment.getActiveProfiles()) {
-            if (profile.equals(activeProfile)) {
+    protected void validateRootCause(Class<? extends Throwable> exceptionClass, Runnable runnable) {
+        Assertions.assertThatThrownBy(runnable::run)
+                .satisfies(ex -> {
+                    if (containsException(ex, exceptionClass)) {
+                        return;
+                    }
+                    Throwable rootCause = NestedExceptionUtils.getMostSpecificCause(ex);
+                    throw new AssertionError("Expected exception of type " + exceptionClass.getName()
+                            + " somewhere in cause chain, but got: " + ex
+                            + ", most specific cause: " + rootCause);
+                });
+    }
+
+    private boolean containsException(Throwable throwable, Class<? extends Throwable> exceptionClass) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (exceptionClass.isInstance(current)) {
                 return true;
             }
+            current = current.getCause();
         }
         return false;
-    }
-
-    protected void validateRootCause(Class rootExceptionClass, Runnable runnable) {
-        assertThatExceptionOfType(Throwable.class)
-                .isThrownBy(runnable::run)
-                .withRootCauseInstanceOf(rootExceptionClass);
     }
 }

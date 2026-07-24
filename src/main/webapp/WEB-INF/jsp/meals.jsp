@@ -7,10 +7,12 @@
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
+<jsp:include page="fragments/bodyHeader.jsp"/>
+
 <section>
-    <jsp:include page="fragments/bodyHeader.jsp"/>
     <hr/>
     <h2><spring:message code="meal.title"/></h2>
+
     <form method="get" action="<c:url value='/meals/filter'/>">
         <dl>
             <dt><spring:message code="meal.startDate"/>:</dt>
@@ -30,9 +32,12 @@
         </dl>
         <button type="submit"><spring:message code="meal.filter"/></button>
     </form>
+
     <hr/>
+
     <a href="<c:url value='/meals/create'/>"><spring:message code="meal.add"/></a>
     <br><br>
+
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
         <tr>
@@ -46,12 +51,7 @@
         <c:forEach items="${requestScope.meals}" var="meal">
             <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>
             <tr data-meal-excess="${meal.excess}">
-                <td>
-                        <%--${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}--%>
-                        <%--<%=TimeUtil.toString(meal.getDateTime())%>--%>
-                        <%--${fn:replace(meal.dateTime, 'T', ' ')}--%>
-                        ${fn:formatDateTime(meal.dateTime)}
-                </td>
+                <td>${fn:formatDateTime(meal.dateTime)}</td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
                 <td><a href="<c:url value='/meals/update?id=${meal.id}'/>"><spring:message code="common.update"/></a></td>
@@ -59,7 +59,8 @@
             </tr>
         </c:forEach>
     </table>
-    <jsp:include page="fragments/footer.jsp"/>
 </section>
+
+<jsp:include page="fragments/footer.jsp"/>
 </body>
 </html>
