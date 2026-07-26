@@ -15,7 +15,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.TimingRules;
 
-@ContextConfiguration("classpath:spring/spring-test-nocache.xml")
+@ContextConfiguration({
+        "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-db.xml",
+        "classpath:spring/spring-test-nocache.xml"
+})
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
@@ -26,9 +30,6 @@ public abstract class AbstractServiceTest {
 
     @Rule
     public Stopwatch stopwatch = TimingRules.STOPWATCH;
-
-    protected void assumeValidationSupported() {
-    }
 
     protected void validateRootCause(Class<? extends Throwable> exceptionClass, Runnable runnable) {
         Assertions.assertThatThrownBy(runnable::run)

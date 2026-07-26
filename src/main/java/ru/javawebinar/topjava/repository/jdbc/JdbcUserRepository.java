@@ -14,15 +14,13 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import static ru.javawebinar.topjava.util.ValidationUtil.validate;
 
 @Repository
 public class JdbcUserRepository implements UserRepository {
@@ -42,13 +40,13 @@ public class JdbcUserRepository implements UserRepository {
                     "FROM users u LEFT JOIN user_role ur ON u.id = ur.user_id " +
                     "WHERE u.email=?";
 
+    private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class);
+
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertUser;
-    private final Validator validator;
 
     private final ResultSetExtractor<List<User>> usersExtractor = rs -> {
-        BeanPropertyRowMapper<User> mapper = BeanPropertyRowMapper.newInstance(User.class);
         Map<Integer, User> users = new LinkedHashMap<>();
 
         while (rs.next()) {
@@ -56,7 +54,7 @@ public class JdbcUserRepository implements UserRepository {
             User user = users.get(id);
 
             if (user == null) {
-                user = mapper.mapRow(rs, rs.getRow());
+                user = ROW_MAPPER.mapRow(rs, rs.getRow());
                 user.setRoles(EnumSet.noneOf(Role.class));
                 users.put(id, user);
             }
@@ -72,11 +70,9 @@ public class JdbcUserRepository implements UserRepository {
 
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate,
-                              NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-                              Validator validator) {
+                              NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.validator = validator;
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
@@ -143,12 +139,5 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
         return jdbcTemplate.query(SELECT_ALL, usersExtractor);
-    }
-
-    private void validate(User user) {
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
     }
 }

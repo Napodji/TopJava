@@ -11,12 +11,10 @@ import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
+
+import static ru.javawebinar.topjava.util.ValidationUtil.validate;
 
 @Repository
 public class JdbcMealRepository implements MealRepository {
@@ -26,14 +24,11 @@ public class JdbcMealRepository implements MealRepository {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final SimpleJdbcInsert insertMeal;
-    private final Validator validator;
 
     public JdbcMealRepository(JdbcTemplate jdbcTemplate,
-                              NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-                              Validator validator) {
+                              NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.validator = validator;
         this.insertMeal = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("meal")
                 .usingGeneratedKeyColumns("id");
@@ -84,12 +79,5 @@ public class JdbcMealRepository implements MealRepository {
         return jdbcTemplate.query(
                 "SELECT * FROM meal WHERE user_id=? AND date_time >= ? AND date_time < ? ORDER BY date_time DESC",
                 ROW_MAPPER, userId, startDateTime, endDateTime);
-    }
-
-    private void validate(Meal meal) {
-        Set<ConstraintViolation<Meal>> violations = validator.validate(meal);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
     }
 }

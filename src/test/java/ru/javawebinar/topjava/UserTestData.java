@@ -26,13 +26,11 @@ public class UserTestData {
     }
 
     public static User getUpdated() {
-        User updated = new User(admin);
+        User updated = new User(user);
         updated.setEmail("update@gmail.com");
         updated.setName("UpdatedName");
         updated.setCaloriesPerDay(330);
         updated.setPassword("newPass");
-        updated.setEnabled(false);
-        updated.setRoles(Set.of(Role.ADMIN));
         return updated;
     }
 }

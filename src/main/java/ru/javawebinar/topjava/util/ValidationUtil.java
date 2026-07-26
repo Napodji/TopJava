@@ -1,10 +1,17 @@
 package ru.javawebinar.topjava.util;
 
-
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import java.util.Set;
+
 public class ValidationUtil {
+
+    private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 
     private ValidationUtil() {
     }
@@ -36,11 +43,18 @@ public class ValidationUtil {
     }
 
     public static void assureIdConsistent(AbstractBaseEntity entity, int id) {
-//      conservative when you reply, but accept liberally (http://stackoverflow.com/a/32728226/548473)
+        // conservative when you reply, but accept liberally (http://stackoverflow.com/a/32728226/548473)
         if (entity.isNew()) {
             entity.setId(id);
         } else if (entity.id() != id) {
             throw new IllegalArgumentException(entity + " must be with id=" + id);
+        }
+    }
+
+    public static <T> void validate(T bean) {
+        Set<ConstraintViolation<T>> violations = VALIDATOR.validate(bean);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
         }
     }
 }

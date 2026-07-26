@@ -5,9 +5,6 @@
            http://www.springframework.org/schema/beans
            https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="classpath:spring/spring-app.xml"/>
-    <import resource="classpath:spring/spring-db.xml"/>
-
     <bean id="ehCacheManager" class="org.springframework.cache.support.NoOpCacheManager"/>
 
     <beans profile="jpa,datajpa">
