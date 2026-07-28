@@ -1,8 +1,10 @@
 package ru.javawebinar.topjava.service;
 
+import org.hibernate.Hibernate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
@@ -51,7 +53,10 @@ public class UserService {
         checkNotFound(repository.save(user), user.id());
     }
 
+    @Transactional(readOnly = true)
     public User getWithMeals(int id) {
-        return checkNotFound(repository.getWithMeals(id), id);
+        User user = checkNotFound(repository.getWithMeals(id), id);
+        Hibernate.initialize(user.getRoles());
+        return user;
     }
 }
