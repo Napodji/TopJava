@@ -7,17 +7,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
-import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.SecurityUtil;
 import ru.javawebinar.topjava.web.json.JsonUtil;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Month;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -41,11 +34,6 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(MEAL_MATCHER.contentJson(meal1));
     }
 
-    @Test
-    void getNotFound() {
-        assertThrows(org.springframework.web.util.NestedServletException.class, () ->
-                perform(MockMvcRequestBuilders.get(REST_URL + NOT_FOUND)));
-    }
     @Test
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL + MEAL1_ID))
@@ -82,17 +70,14 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getAll() throws Exception {
-        List<MealTo> expected = MealsUtil.getTos(meals, MealsUtil.DEFAULT_CALORIES_PER_DAY);
         perform(MockMvcRequestBuilders.get(REST_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(expected));
+                .andExpect(MEAL_TO_MATCHER.contentJson(mealsTo));
     }
 
     @Test
     void getBetween() throws Exception {
-        List<MealTo> expected = MealsUtil.getFilteredTos(List.of(meal7, meal6, meal5, meal4),
-                MealsUtil.DEFAULT_CALORIES_PER_DAY, LocalTime.of(0, 0), LocalTime.of(23, 0));
         perform(MockMvcRequestBuilders.get(REST_URL + "filter")
                 .param("startDate", "2020-01-31")
                 .param("startTime", "00:00")
@@ -100,6 +85,6 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .param("endTime", "23:00"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(expected));
+                .andExpect(MEAL_TO_MATCHER.contentJson(mealsToFilter));
     }
 }

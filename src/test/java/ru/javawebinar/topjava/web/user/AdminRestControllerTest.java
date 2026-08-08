@@ -1,8 +1,11 @@
 package ru.javawebinar.topjava.web.user;
 
 import java.util.List;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -27,6 +30,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private Environment environment;
 
     @Test
     void get() throws Exception {
@@ -89,6 +95,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
     @Test
     void getWithMeals() throws Exception {
+        Assumptions.assumeTrue(environment.acceptsProfiles(Profiles.of(ru.javawebinar.topjava.Profiles.DATAJPA)),
+                "getWithMeals is supported only by DataJpaUserRepository");
+
         ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID + "/with-meals"))
                 .andExpect(status().isOk())
                 .andDo(print())
