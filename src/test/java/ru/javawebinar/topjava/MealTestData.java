@@ -2,6 +2,7 @@ package ru.javawebinar.topjava;
 
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
@@ -30,22 +31,18 @@ public class MealTestData {
 
     public static final List<Meal> meals = List.of(meal7, meal6, meal5, meal4, meal3, meal2, meal1);
 
-    public static final List<MealTo> mealsTo = List.of(
-            new MealTo(meal7.getId(), meal7.getDateTime(), meal7.getDescription(), meal7.getCalories(), true),
-            new MealTo(meal6.getId(), meal6.getDateTime(), meal6.getDescription(), meal6.getCalories(), true),
-            new MealTo(meal5.getId(), meal5.getDateTime(), meal5.getDescription(), meal5.getCalories(), true),
-            new MealTo(meal4.getId(), meal4.getDateTime(), meal4.getDescription(), meal4.getCalories(), true),
-            new MealTo(meal3.getId(), meal3.getDateTime(), meal3.getDescription(), meal3.getCalories(), false),
-            new MealTo(meal2.getId(), meal2.getDateTime(), meal2.getDescription(), meal2.getCalories(), false),
-            new MealTo(meal1.getId(), meal1.getDateTime(), meal1.getDescription(), meal1.getCalories(), false)
-    );
+    private static final MealTo mealTo1 = MealsUtil.createTo(meal1, false);
+    private static final MealTo mealTo2 = MealsUtil.createTo(meal2, false);
+    private static final MealTo mealTo3 = MealsUtil.createTo(meal3, false);
 
-    public static final List<MealTo> mealsToFilter = List.of(
-            new MealTo(meal7.getId(), meal7.getDateTime(), meal7.getDescription(), meal7.getCalories(), true),
-            new MealTo(meal6.getId(), meal6.getDateTime(), meal6.getDescription(), meal6.getCalories(), true),
-            new MealTo(meal5.getId(), meal5.getDateTime(), meal5.getDescription(), meal5.getCalories(), true),
-            new MealTo(meal4.getId(), meal4.getDateTime(), meal4.getDescription(), meal4.getCalories(), true)
-    );
+    public static final MealTo mealTo4 = MealsUtil.createTo(meal4, true);
+    public static final MealTo mealTo5 = MealsUtil.createTo(meal5, true);
+    public static final MealTo mealTo6 = MealsUtil.createTo(meal6, true);
+    public static final MealTo mealTo7 = MealsUtil.createTo(meal7, true);
+
+    public static final List<MealTo> mealsTo = List.of(mealTo7, mealTo6, mealTo5, mealTo4, mealTo3, mealTo2, mealTo1);
+
+    public static final List<MealTo> mealsToFilter = List.of(mealTo7, mealTo6, mealTo5, mealTo4);
 
     public static Meal getNew() {
         return new Meal(null, of(2020, Month.FEBRUARY, 1, 18, 0), "Созданный ужин", 300);

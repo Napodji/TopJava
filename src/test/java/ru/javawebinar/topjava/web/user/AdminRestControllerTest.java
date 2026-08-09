@@ -31,9 +31,6 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private Environment environment;
-
     @Test
     void get() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID))
@@ -95,8 +92,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
     @Test
     void getWithMeals() throws Exception {
-        Assumptions.assumeTrue(environment.acceptsProfiles(Profiles.of(ru.javawebinar.topjava.Profiles.DATAJPA)),
-                "getWithMeals is supported only by DataJpaUserRepository");
+        assumeDataJpaProfile();
 
         ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID + "/with-meals"))
                 .andExpect(status().isOk())
