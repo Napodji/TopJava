@@ -1,4 +1,4 @@
-const userAjaxUrl = "admin/users/";
+const userAjaxUrl = "rest/admin/users/";
 
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
@@ -45,3 +45,13 @@ $(function () {
         })
     );
 });
+
+function enable(id, enabled) {
+    $.ajax({
+        url: ctx.ajaxUrl + id + "?enabled=" + enabled,
+        type: "PATCH"
+    }).done(function () {
+        $("#" + id).toggleClass("disabled-user", !enabled);
+        successNoty("Saved");
+    });
+}
