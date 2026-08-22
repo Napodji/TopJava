@@ -3,7 +3,7 @@ let form;
 function makeEditable(datatableApi) {
     ctx.datatableApi = datatableApi;
     form = $('#detailsForm');
-    $(".delete").click(function () {
+    $("#datatable").on("click", ".delete", function () {
         if (confirm('Are you sure?')) {
             deleteRow($(this).closest('tr').attr("id"));
         }
@@ -13,7 +13,6 @@ function makeEditable(datatableApi) {
         failNoty(jqXHR);
     });
 
-    // solve problem with cache in IE: https://stackoverflow.com/a/4303862/548473
     $.ajaxSetup({cache: false});
 }
 
@@ -32,9 +31,15 @@ function deleteRow(id) {
     });
 }
 
+function fillTable(data) {
+    ctx.datatableApi.clear().rows.add(data).draw();
+}
+
 function updateTable() {
-    $.get(ctx.ajaxUrl, function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
+    let url = ctx.updateUrl || ctx.ajaxUrl;
+    let params = (typeof getTableParams === "function") ? getTableParams() : undefined;
+    $.get(url, params, function (data) {
+        fillTable(data);
     });
 }
 
@@ -62,7 +67,7 @@ function closeNoty() {
 function successNoty(text) {
     closeNoty();
     new Noty({
-        text: "<span class='fa fa-lg fa-check'></span> &nbsp;" + text,
+        text: " " + text,
         type: 'success',
         layout: "bottomRight",
         timeout: 1000
@@ -72,9 +77,9 @@ function successNoty(text) {
 function failNoty(jqXHR) {
     closeNoty();
     failedNote = new Noty({
-        text: "<span class='fa fa-lg fa-exclamation-circle'></span> &nbsp;Error status: " + jqXHR.status,
+        text: " Error status: " + jqXHR.status,
         type: "error",
         layout: "bottomRight"
     });
-    failedNote.show()
+    failedNote.show();
 }

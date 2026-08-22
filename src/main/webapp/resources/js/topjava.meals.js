@@ -1,7 +1,8 @@
-const mealAjaxUrl = "rest/profile/meals/";
+const mealAjaxUrl = "meals/";
 
 const ctx = {
-    ajaxUrl: mealAjaxUrl
+    ajaxUrl: mealAjaxUrl,
+    updateUrl: mealAjaxUrl + "filter"
 };
 
 $(function () {
@@ -9,74 +10,38 @@ $(function () {
         $("#datatable").DataTable({
             "paging": false,
             "info": true,
+            "rowId": "id",
             "columns": [
+                {"data": "dateTime"},
+                {"data": "description"},
+                {"data": "calories"},
                 {
-                    "data": "dateTime"
-                },
-                {
-                    "data": "description"
-                },
-                {
-                    "data": "calories"
-                },
-                {
-                    "defaultContent": "Delete",
-                    "orderable": false
+                    "data": null,
+                    "orderable": false,
+                    "render": function () {
+                        return '<a class="delete"><span class="fa fa-remove"></span></a>';
+                    }
                 }
             ],
-            "order": [
-                [
-                    0,
-                    "desc"
-                ]
-            ]
+            "order": [[0, "desc"]],
+            "createdRow": function (row, data) {
+                $(row).attr("data-meal-excess", data.excess);
+            }
         })
     );
 });
 
-function save() {
-    let meal = {
-        id: $("#id").val() || null,
-        dateTime: $("#dateTime").val(),
-        description: $("#description").val(),
-        calories: $("#calories").val()
-    };
-
-    $.ajax({
-        type: "POST",
-        url: ctx.ajaxUrl,
-        contentType: "application/json",
-        data: JSON.stringify(meal)
-    }).done(function () {
-        $("#editRow").modal("hide");
-        updateTable();
-        successNoty("Saved");
-    });
+function getTableParams() {
+    return $("#filterForm").find(":input").filter(function () {
+        return $(this).val() !== "";
+    }).serialize();
 }
 
 function filterMeals() {
-    $.ajax({
-        url: ctx.ajaxUrl + "filter",
-        type: "GET",
-        data: $("#filterForm").serialize()
-    }).done(function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
-    });
+    updateTable();
 }
 
 function resetFilter() {
     $("#filterForm").find(":input").val("");
     updateTable();
-}
-
-function updateTable() {
-    let filterParams = $("#filterForm").serialize();
-
-    $.ajax({
-        url: ctx.ajaxUrl + "filter",
-        type: "GET",
-        data: filterParams
-    }).done(function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
-    });
 }

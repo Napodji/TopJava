@@ -38,7 +38,7 @@
                     <td>
                         <input type="checkbox" class="enabled-checkbox"
                                <c:if test="${user.enabled}">checked</c:if>
-                               onclick="enable(${user.id}, this.checked)"/>
+                               onclick="enable(this, ${user.id})"/>
                     </td>
                     <td><fmt:formatDate value="${user.registered}" pattern="dd-MMMM-yyyy"/></td>
                     <td><a><span class="fa fa-pencil"></span></a></td>

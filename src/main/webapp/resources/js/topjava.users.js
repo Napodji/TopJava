@@ -1,57 +1,50 @@
-const userAjaxUrl = "rest/admin/users/";
+const userAjaxUrl = "admin/users/";
 
-// https://stackoverflow.com/a/5064235/548473
 const ctx = {
     ajaxUrl: userAjaxUrl
 };
 
-// $(document).ready(function () {
 $(function () {
     makeEditable(
         $("#datatable").DataTable({
             "paging": false,
             "info": true,
+            "rowId": "id",
             "columns": [
+                {"data": "name"},
+                {"data": "email"},
+                {"data": "roles"},
+                {"data": "enabled"},
+                {"data": "registered"},
                 {
-                    "data": "name"
+                    "data": null,
+                    "orderable": false,
+                    "render": function () {
+                        return '<a><span class="fa fa-pencil"></span></a>';
+                    }
                 },
                 {
-                    "data": "email"
-                },
-                {
-                    "data": "roles"
-                },
-                {
-                    "data": "enabled"
-                },
-                {
-                    "data": "registered"
-                },
-                {
-                    "defaultContent": "Edit",
-                    "orderable": false
-                },
-                {
-                    "defaultContent": "Delete",
-                    "orderable": false
+                    "data": null,
+                    "orderable": false,
+                    "render": function () {
+                        return '<a class="delete"><span class="fa fa-remove"></span></a>';
+                    }
                 }
             ],
-            "order": [
-                [
-                    0,
-                    "asc"
-                ]
-            ]
+            "order": [[0, "asc"]]
         })
     );
 });
 
-function enable(id, enabled) {
+function enable(checkbox, id) {
+    const active = checkbox.checked;
     $.ajax({
-        url: ctx.ajaxUrl + id + "?enabled=" + enabled,
+        url: ctx.ajaxUrl + id + "?active=" + active,
         type: "PATCH"
     }).done(function () {
-        $("#" + id).toggleClass("disabled-user", !enabled);
-        successNoty("Saved");
+        $(checkbox).closest("tr").toggleClass("disabled-user", !active);
+        successNoty(active ? "Enabled" : "Disabled");
+    }).fail(function () {
+        checkbox.checked = !active;
     });
 }
