@@ -59,12 +59,9 @@ function save() {
         dateTimeField.val(isoValue);
     }
 
-    const id = form.find("input[name='id']").val();
-    const isNew = !id;
-
     $.ajax({
-        type: isNew ? "POST" : "PUT",
-        url: isNew ? ctx.ajaxUrl : ctx.ajaxUrl + id,
+        type: "POST",
+        url: ctx.ajaxUrl,
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
@@ -109,7 +106,7 @@ function renderDeleteBtn(data, type, row) {
 function failNoty(jqXHR) {
     closeNoty();
     failedNote = new Noty({
-        text: `<i class="fa fa-warning"></i> ${i18n['common.errorStatus']}: ${jqXHR.status}${jqXHR.hasOwnProperty('responseJSON') ? ' ' + JSON.stringify(jqXHR.responseJSON) : ''}`,
+        text: `<i class="fa fa-warning"></i> ${i18n['common.errorStatus']}: ${jqXHR.status}${jqXHR.hasOwnProperty('responseJSON') ? ' ' + jqXHR.responseJSON : ''}`,
         type: "error",
         layout: "bottomRight"
     });

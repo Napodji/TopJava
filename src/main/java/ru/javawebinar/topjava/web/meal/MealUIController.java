@@ -13,6 +13,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/profile/meals", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,21 +39,20 @@ public class MealUIController extends AbstractMealController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid Meal meal, BindingResult result) {
+    public ResponseEntity<?> createOrUpdate(@Valid Meal meal, BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.unprocessableEntity().body(result.getAllErrors());
+            String errorFieldsMsg = result.getFieldErrors().stream()
+                    .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                    .collect(Collectors.joining(""));
+            return ResponseEntity.unprocessableEntity().body(errorFieldsMsg);
         }
-        Meal created = super.create(meal);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@Valid Meal meal, BindingResult result, @PathVariable int id) {
-        if (result.hasErrors()) {
-            return ResponseEntity.unprocessableEntity().body(result.getAllErrors());
+        if (meal.isNew()) {
+            Meal created = super.create(meal);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } else {
+            super.update(meal, meal.id());
+            return ResponseEntity.ok().build();
         }
-        super.update(meal, id);
-        return ResponseEntity.noContent().build();
     }
 
     @Override
