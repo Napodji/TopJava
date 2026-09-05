@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web.meal;
 
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -12,6 +11,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -81,6 +81,29 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateInvalid() throws Exception {
+        Meal invalid = getUpdated();
+        invalid.setDescription("A");
+        perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(invalid)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void updateDuplicateDateTime() throws Exception {
+        Meal duplicate = getUpdated();
+        duplicate.setDateTime(meal2.getDateTime());
+        perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(duplicate)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andExpect(content().string(containsString("already exists")));
+    }
+
+    @Test
     void createWithLocation() throws Exception {
         Meal newMeal = getNew();
         ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
@@ -94,6 +117,32 @@ class MealRestControllerTest extends AbstractControllerTest {
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
         MEAL_MATCHER.assertMatch(mealService.get(newId, USER_ID), newMeal);
+    }
+
+    @Test
+    void createWithLocationInvalid() throws Exception {
+        Meal invalid = getNew();
+        invalid.setCalories(5);
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(invalid)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().string(containsString("calories")));
+    }
+
+    @Test
+    void createDuplicateDateTime() throws Exception {
+        Meal duplicate = getNew();
+        duplicate.setDateTime(meal1.getDateTime());
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(duplicate)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andExpect(content().string(containsString("already exists")));
     }
 
     @Test

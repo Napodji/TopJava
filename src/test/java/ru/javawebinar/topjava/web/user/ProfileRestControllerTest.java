@@ -12,6 +12,7 @@ import ru.javawebinar.topjava.util.UsersUtil;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,6 +66,27 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void registerInvalid() throws Exception {
+        UserTo invalidTo = new UserTo(null, "newName", "invalidEmail", "newPassword", 1500);
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(invalidTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void registerDuplicateEmail() throws Exception {
+        UserTo duplicateTo = new UserTo(null, "newName", user.getEmail(), "newPassword", 1500);
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(duplicateTo)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andExpect(content().string(containsString("already exists")));
+    }
+
+    @Test
     void update() throws Exception {
         UserTo updatedTo = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 1500);
         perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
@@ -74,6 +96,28 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         USER_MATCHER.assertMatch(userService.get(USER_ID), UsersUtil.updateFromTo(new User(user), updatedTo));
+    }
+
+    @Test
+    void updateInvalid() throws Exception {
+        UserTo invalidTo = new UserTo(null, "newName", "user@yandex.ru", "1234", 1500);
+        perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(invalidTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().string(containsString("password")));
+    }
+
+    @Test
+    void updateDuplicateEmail() throws Exception {
+        UserTo duplicateTo = new UserTo(null, "newName", admin.getEmail(), "newPassword", 1500);
+        perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(duplicateTo)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andExpect(content().string(containsString("already exists")));
     }
 
     @Test

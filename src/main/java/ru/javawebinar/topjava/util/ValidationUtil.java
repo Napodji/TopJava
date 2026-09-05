@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.util;
 
 import org.springframework.core.NestedExceptionUtils;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.BindingResult;
 import ru.javawebinar.topjava.HasId;
@@ -17,9 +16,9 @@ public class ValidationUtil {
     private static final Validator validator;
 
     static {
-        //  From Javadoc: implementations are thread-safe and instances are typically cached and reused.
+        // From Javadoc: implementations are thread-safe and instances are typically cached and reused.
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        //  From Javadoc: implementations of this interface must be thread-safe
+        // From Javadoc: implementations of this interface must be thread-safe
         validator = factory.getValidator();
     }
 
@@ -61,7 +60,7 @@ public class ValidationUtil {
     }
 
     public static void assureIdConsistent(HasId bean, int id) {
-//      conservative when you reply, but accept liberally (http://stackoverflow.com/a/32728226/548473)
+        // conservative when you reply, but accept liberally (http://stackoverflow.com/a/32728226/548473)
         if (bean.isNew()) {
             bean.setId(id);
         } else if (bean.id() != id) {
@@ -69,18 +68,16 @@ public class ValidationUtil {
         }
     }
 
-    //  https://stackoverflow.com/a/65442410/548473
+    // https://stackoverflow.com/a/65442410/548473
     @NonNull
     public static Throwable getRootCause(@NonNull Throwable t) {
         Throwable rootCause = NestedExceptionUtils.getRootCause(t);
         return rootCause != null ? rootCause : t;
     }
 
-    public static ResponseEntity<String> getErrorResponse(BindingResult result) {
-        return ResponseEntity.unprocessableEntity().body(
-                result.getFieldErrors().stream()
-                        .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                        .collect(Collectors.joining("<br>"))
-        );
+    public static String getErrorResponse(BindingResult result) {
+        return result.getFieldErrors().stream()
+                .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                .collect(Collectors.joining("; "));
     }
 }

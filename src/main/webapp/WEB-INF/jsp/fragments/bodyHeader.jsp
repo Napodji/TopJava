@@ -12,6 +12,8 @@
                     <a class="btn btn-info mr-1" href="users"><spring:message code="user.title"/></a>
                 </sec:authorize>
                 <a class="btn btn-info mr-1" href="profile">${userTo.name} <spring:message code="app.profile"/></a>
+                <a class="btn btn-secondary mr-1" href="?lang=en">EN</a>
+                <a class="btn btn-secondary mr-1" href="?lang=ru">RU</a>
                 <button class="btn btn-primary my-1" type="submit">
                     <span class="fa fa-sign-out"></span>
                 </button>
@@ -19,6 +21,8 @@
         </sec:authorize>
         <sec:authorize access="isAnonymous()">
             <form:form class="form-inline my-2" id="login_form" action="spring_security_check" method="post">
+                <a class="btn btn-secondary mr-1" href="?lang=en">EN</a>
+                <a class="btn btn-secondary mr-1" href="?lang=ru">RU</a>
                 <input class="form-control mr-1" type="text" placeholder="Email" name="username">
                 <input class="form-control mr-1" type="password" placeholder="Password" name="password">
                 <button class="btn btn-success" type="submit">
