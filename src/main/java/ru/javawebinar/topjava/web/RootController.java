@@ -13,10 +13,10 @@ public class RootController {
     @GetMapping("/")
     public String root() {
         log.info("root");
-        return "redirect:meals";
+        return "redirect:/meals";
     }
 
-    //    @Secured("ROLE_ADMIN")
+    // @Secured("ROLE_ADMIN")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     public String getUsers() {

@@ -1,5 +1,9 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -8,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.to.UserTo;
+import ru.javawebinar.topjava.util.ValidationUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import javax.validation.Valid;
@@ -15,6 +20,11 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/profile")
 public class ProfileUIController extends AbstractUserController {
+
+    private static final String EMAIL_DUPLICATE_CONSTRAINT = "users_unique_email_idx";
+
+    @Autowired
+    private MessageSource messageSource;
 
     @GetMapping
     public String profile() {
@@ -26,10 +36,14 @@ public class ProfileUIController extends AbstractUserController {
         if (result.hasErrors()) {
             return "profile";
         } else {
-            super.update(userTo, SecurityUtil.authUserId());
-            SecurityUtil.get().setTo(userTo);
-            status.setComplete();
-            return "redirect:/meals";
+            try {
+                super.update(userTo, SecurityUtil.authUserId());
+                SecurityUtil.get().setTo(userTo);
+                status.setComplete();
+                return "redirect:/meals";
+            } catch (DataIntegrityViolationException e) {
+                return processDuplicateEmail(e, result);
+            }
         }
     }
 
@@ -46,9 +60,25 @@ public class ProfileUIController extends AbstractUserController {
             model.addAttribute("register", true);
             return "profile";
         } else {
-            super.create(userTo);
-            status.setComplete();
-            return "redirect:/login?message=app.registered&username=" + userTo.getEmail();
+            try {
+                super.create(userTo);
+                status.setComplete();
+                return "redirect:/login?message=app.registered&username=" + userTo.getEmail();
+            } catch (DataIntegrityViolationException e) {
+                model.addAttribute("register", true);
+                return processDuplicateEmail(e, result);
+            }
         }
+    }
+
+    private String processDuplicateEmail(DataIntegrityViolationException e, BindingResult result) {
+        String rootMessage = ValidationUtil.getRootCause(e).getMessage();
+        String lowerMessage = rootMessage == null ? "" : rootMessage.toLowerCase();
+        if (lowerMessage.contains(EMAIL_DUPLICATE_CONSTRAINT)) {
+            String message = messageSource.getMessage("error.duplicateEmail", null, LocaleContextHolder.getLocale());
+            result.rejectValue("email", "error.duplicateEmail", message);
+            return "profile";
+        }
+        throw e;
     }
 }

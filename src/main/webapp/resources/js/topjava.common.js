@@ -85,7 +85,7 @@ function closeNoty() {
 function successNoty(key) {
     closeNoty();
     new Noty({
-        text: `<span class='fa fa-lg fa-check'></span> &nbsp;${i18n[key]}`,
+        text: `${i18n[key]}`,
         type: 'success',
         layout: "bottomRight",
         timeout: 1000
@@ -94,23 +94,27 @@ function successNoty(key) {
 
 function renderEditBtn(data, type, row) {
     if (type === "display") {
-        return `<a onclick='updateRow(${row.id});'><span class='fa fa-pencil'></span></a>`;
+        return ``;
     }
 }
 
 function renderDeleteBtn(data, type, row) {
     if (type === "display") {
-        return `<a onclick='deleteRow(${row.id});'><span class='fa fa-remove'></span></a>`;
+        return ``;
     }
+}
+
+function formatErrorDetail(detail) {
+    return detail.split(';').map(part => part.trim()).filter(part => part.length > 0).join('<br>');
 }
 
 function failNoty(jqXHR) {
     closeNoty();
     var errorInfo = jqXHR.responseJSON;
     failedNote = new Noty({
-        text: `<span class='fa fa-lg fa-exclamation-circle'></span> &nbsp;${i18n['common.errorStatus']}: ${jqXHR.status}<br>${errorInfo.type}<br>${errorInfo.detail}`,
+        text: `${i18n['common.errorStatus']}: ${jqXHR.status} ${errorInfo.type}<br>${formatErrorDetail(errorInfo.detail)}`,
         type: "error",
         layout: "bottomRight"
     });
-    failedNote.show()
+    failedNote.show();
 }

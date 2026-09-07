@@ -2,6 +2,8 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,8 +31,15 @@ public class ExceptionInfoHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
+    // constraint names from initDB.sql, used to recognize the exact cause of DataIntegrityViolationException
     private static final String EMAIL_DUPLICATE_CONSTRAINT = "users_unique_email_idx";
     private static final String MEAL_DATETIME_DUPLICATE_CONSTRAINT = "meal_unique_user_datetime_idx";
+
+    private final MessageSource messageSource;
+
+    public ExceptionInfoHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     // http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -44,14 +53,15 @@ public class ExceptionInfoHandler {
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
         String rootMessage = ValidationUtil.getRootCause(e).getMessage();
         String lowerMessage = rootMessage == null ? "" : rootMessage.toLowerCase();
-        String detail;
+        String messageCode;
         if (lowerMessage.contains(EMAIL_DUPLICATE_CONSTRAINT)) {
-            detail = "User with this email already exists";
+            messageCode = "error.duplicateEmail";
         } else if (lowerMessage.contains(MEAL_DATETIME_DUPLICATE_CONSTRAINT)) {
-            detail = "Meal with this date/time already exists";
+            messageCode = "error.duplicateMealDateTime";
         } else {
             return logAndGetErrorInfo(req, e, true, DATA_ERROR);
         }
+        String detail = messageSource.getMessage(messageCode, null, LocaleContextHolder.getLocale());
         log.warn("{} at request {}: {}", DATA_ERROR, req.getRequestURL(), detail);
         return new ErrorInfo(req.getRequestURL(), DATA_ERROR, detail);
     }
