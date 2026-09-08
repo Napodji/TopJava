@@ -9,7 +9,6 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.*;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ValidationUtil {
 
@@ -26,7 +25,7 @@ public class ValidationUtil {
     }
 
     public static <T> void validate(T bean) {
-        // https://alexkosarev.name/2018/07/30/bean-validation-api/
+        // [https://alexkosarev.name/2018/07/30/bean-validation-api/](https://alexkosarev.name/2018/07/30/bean-validation-api/)
         Set<ConstraintViolation<T>> violations = validator.validate(bean);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
@@ -68,16 +67,16 @@ public class ValidationUtil {
         }
     }
 
-    // https://stackoverflow.com/a/65442410/548473
+    // [https://stackoverflow.com/a/65442410/548473](https://stackoverflow.com/a/65442410/548473)
     @NonNull
     public static Throwable getRootCause(@NonNull Throwable t) {
         Throwable rootCause = NestedExceptionUtils.getRootCause(t);
         return rootCause != null ? rootCause : t;
     }
 
-    public static String getErrorResponse(BindingResult result) {
+    public static String[] getErrorResponse(BindingResult result) {
         return result.getFieldErrors().stream()
                 .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                .collect(Collectors.joining("; "));
+                .toArray(String[]::new);
     }
 }

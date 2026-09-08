@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.web.user;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.UserTestData;
@@ -33,7 +34,6 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(admin)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                // https://jira.spring.io/browse/SPR-14472
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(admin));
     }
@@ -113,6 +113,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
     void updateDuplicateEmail() throws Exception {
         User updated = getUpdated();
         updated.setEmail(admin.getEmail());
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
         perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(admin))
@@ -154,6 +157,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
     void createDuplicateEmail() throws Exception {
         User newUser = getNew();
         newUser.setEmail(user.getEmail());
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
         perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(admin))

@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.web.user;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.model.User;
@@ -78,6 +79,9 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     @Test
     void registerDuplicateEmail() throws Exception {
         UserTo duplicateTo = new UserTo(null, "newName", user.getEmail(), "newPassword", 1500);
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
         perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(duplicateTo)))
@@ -112,6 +116,9 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     @Test
     void updateDuplicateEmail() throws Exception {
         UserTo duplicateTo = new UserTo(null, "newName", admin.getEmail(), "newPassword", 1500);
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
         perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(duplicateTo)))

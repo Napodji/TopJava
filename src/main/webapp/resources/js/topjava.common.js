@@ -3,7 +3,8 @@ let form;
 function makeEditable(datatableOpts) {
     ctx.datatableApi = $("#datatable").DataTable(
         {
-            ...datatableOpts, // https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+            ...datatableOpts,
+
             "ajax": {
                 "url": ctx.ajaxUrl,
                 "dataSrc": ""
@@ -18,7 +19,6 @@ function makeEditable(datatableOpts) {
         failNoty(jqXHR);
     });
 
-    // solve problem with cache in IE: https://stackoverflow.com/a/4303862/548473
     $.ajaxSetup({cache: false});
 
     var token = $("meta[name='_csrf']").attr("content");
@@ -104,15 +104,15 @@ function renderDeleteBtn(data, type, row) {
     }
 }
 
-function formatErrorDetail(detail) {
-    return detail.split(';').map(part => part.trim()).filter(part => part.length > 0).join('<br>');
+function formatErrorDetail(details) {
+    return details.map(part => part.trim()).filter(part => part.length > 0).join('<br>');
 }
 
 function failNoty(jqXHR) {
     closeNoty();
     var errorInfo = jqXHR.responseJSON;
     failedNote = new Noty({
-        text: `${i18n['common.errorStatus']}: ${jqXHR.status} ${errorInfo.type}<br>${formatErrorDetail(errorInfo.detail)}`,
+        text: `${i18n['common.errorStatus']}: ${jqXHR.status} ${errorInfo.type}<br>${formatErrorDetail(errorInfo.details)}`,
         type: "error",
         layout: "bottomRight"
     });

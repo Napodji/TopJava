@@ -1,8 +1,5 @@
 package ru.javawebinar.topjava.web.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,9 +19,6 @@ import javax.validation.Valid;
 public class ProfileUIController extends AbstractUserController {
 
     private static final String EMAIL_DUPLICATE_CONSTRAINT = "users_unique_email_idx";
-
-    @Autowired
-    private MessageSource messageSource;
 
     @GetMapping
     public String profile() {
@@ -75,8 +69,7 @@ public class ProfileUIController extends AbstractUserController {
         String rootMessage = ValidationUtil.getRootCause(e).getMessage();
         String lowerMessage = rootMessage == null ? "" : rootMessage.toLowerCase();
         if (lowerMessage.contains(EMAIL_DUPLICATE_CONSTRAINT)) {
-            String message = messageSource.getMessage("error.duplicateEmail", null, LocaleContextHolder.getLocale());
-            result.rejectValue("email", "error.duplicateEmail", message);
+            result.rejectValue("email", "error.duplicateEmail");
             return "profile";
         }
         throw e;

@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.web.meal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.model.Meal;
@@ -95,6 +96,9 @@ class MealRestControllerTest extends AbstractControllerTest {
     void updateDuplicateDateTime() throws Exception {
         Meal duplicate = getUpdated();
         duplicate.setDateTime(meal2.getDateTime());
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
         perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(duplicate)))
@@ -136,6 +140,9 @@ class MealRestControllerTest extends AbstractControllerTest {
     void createDuplicateDateTime() throws Exception {
         Meal duplicate = getNew();
         duplicate.setDateTime(meal1.getDateTime());
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
         perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))

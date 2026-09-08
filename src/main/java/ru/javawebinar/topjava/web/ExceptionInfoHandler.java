@@ -22,6 +22,7 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -31,7 +32,6 @@ public class ExceptionInfoHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
-    // constraint names from initDB.sql, used to recognize the exact cause of DataIntegrityViolationException
     private static final String EMAIL_DUPLICATE_CONSTRAINT = "users_unique_email_idx";
     private static final String MEAL_DATETIME_DUPLICATE_CONSTRAINT = "meal_unique_user_datetime_idx";
 
@@ -41,7 +41,6 @@ public class ExceptionInfoHandler {
         this.messageSource = messageSource;
     }
 
-    // http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotFoundException.class)
     public ErrorInfo notFoundError(HttpServletRequest req, NotFoundException e) {
@@ -75,9 +74,9 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY) // 422
     @ExceptionHandler(BindException.class)
     public ErrorInfo bindValidationError(HttpServletRequest req, BindException e) {
-        String detail = ValidationUtil.getErrorResponse(e.getBindingResult());
-        log.warn("{} at request {}: {}", VALIDATION_ERROR, req.getRequestURL(), detail);
-        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, detail);
+        String[] details = ValidationUtil.getErrorResponse(e.getBindingResult());
+        log.warn("{} at request {}: {}", VALIDATION_ERROR, req.getRequestURL(), Arrays.toString(details));
+        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, details);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -86,7 +85,6 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);
     }
 
-    // https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         if (logException) {
