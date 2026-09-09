@@ -74,9 +74,7 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY) // 422
     @ExceptionHandler(BindException.class)
     public ErrorInfo bindValidationError(HttpServletRequest req, BindException e) {
-        String[] details = ValidationUtil.getErrorResponse(e.getBindingResult());
-        log.warn("{} at request {}: {}", VALIDATION_ERROR, req.getRequestURL(), Arrays.toString(details));
-        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, details);
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, ValidationUtil.getErrorResponse(e.getBindingResult()));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -85,13 +83,15 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);
     }
 
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
-        Throwable rootCause = ValidationUtil.getRootCause(e);
-        if (logException) {
-            log.error(errorType + " at request " + req.getRequestURL(), rootCause);
-        } else {
-            log.warn("{} at request {}: {}", errorType, req.getRequestURL(), rootCause.toString());
+    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logStackTrace, ErrorType errorType, String... details) {
+        if (details.length == 0) {
+            details = new String[]{ValidationUtil.getRootCause(e).getMessage()};
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
+        if (logStackTrace) {
+            log.error(errorType + " at request " + req.getRequestURL(), ValidationUtil.getRootCause(e));
+        } else {
+            log.warn("{} at request {}: {}", errorType, req.getRequestURL(), Arrays.toString(details));
+        }
+        return new ErrorInfo(req.getRequestURL(), errorType, details);
     }
 }

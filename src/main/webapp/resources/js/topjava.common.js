@@ -94,13 +94,13 @@ function successNoty(key) {
 
 function renderEditBtn(data, type, row) {
     if (type === "display") {
-        return ``;
+        return `<span class="fa fa-pencil" onclick="updateRow(${row.id})"></span>`;
     }
 }
 
 function renderDeleteBtn(data, type, row) {
     if (type === "display") {
-        return ``;
+        return `<span class="fa fa-trash-o" onclick="deleteRow(${row.id})"></span>`;
     }
 }
 
